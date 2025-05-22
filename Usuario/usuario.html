@@ -1,0 +1,249 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .contenedor-principal {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        
+        .titulo-principal {
+            color: #333;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+        
+        .grupo-botones {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .boton {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        .boton-activo {
+            background-color: #0056b3;
+            color: white;
+        }
+        
+        .boton-inactivo {
+            background-color: #6c757d;
+            color: white;
+        }
+        
+        .boton-accion {
+            background-color: #28a745;
+            color: white;
+        }
+        
+        .boton-peligro {
+            background-color: #dc3545;
+            color: white;
+        }
+        
+        .tabla-correos {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        .tabla-correos th, .tabla-correos td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .tabla-correos th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+        }
+        
+        .tabla-correos tr:hover {
+            background-color: #f1f1f1;
+        }
+        
+        .correo-leido {
+            background-color: #f8f9fa;
+        }
+        
+        .correo-enviado {
+            font-style: italic;
+            color: #6c757d;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 20px;
+            border-radius: 8px;
+            width: 80%;
+            max-width: 800px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.2);
+            position: relative;
+        }
+        
+        .close {
+            color: #aaa;
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+        }
+
+        .email-info {
+            margin: 20px 0;
+        }
+        
+        .email-info p {
+            margin: 8px 0;
+        }
+        
+        .email-content {
+            margin-top: 15px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+            min-height: 100px;
+        }
+        
+        .grupo-formulario {
+            margin-bottom: 15px;
+        }
+        
+        .etiqueta-formulario {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        .entrada-formulario {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        
+        .area-texto {
+            height: 200px;
+            resize: vertical;
+        }
+        
+        .botones-accion {
+            margin-top: 20px;
+            text-align: right;
+        }
+        
+        .botones-accion .boton {
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="contenedor-principal">
+        <h1 class="titulo-principal">Bandeja de Correo</h1>
+        
+        <div class="grupo-botones">
+            <button id="btn-entrada" class="boton boton-activo">Bandeja de Entrada</button>
+            <button id="btn-salida" class="boton boton-inactivo">Bandeja de Salida</button>
+            <button id="btn-borradores" class="boton boton-inactivo">Borradores</button>
+            <button id="btn-redactar" class="boton boton-accion">Redactar</button>
+            <button id="btn-salir" class="boton boton-peligro">Salir</button>
+        </div>
+        
+        <table id="tabla-bandeja" class="tabla-correos">
+            <thead>
+                <tr>
+                    <th>Remitente/Destinatario</th>
+                    <th>Asunto</th>
+                    <th>Estado</th>
+                    <th>Operaciones</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
+
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 id="titulo-modal">Título del Modal</h2>
+            <div id="contenido-modal">
+            </div>
+        </div>
+    </div>
+
+    <div id="modalRedactar" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 id="titulo-modal-redactar">Redactar Correo</h2>
+            <div id="contenido-modal-redactar">
+                <form id="formulario-redactar">
+                    <input type="hidden" id="redactar-id">
+                    <div class="grupo-formulario">
+                        <label for="redactar-destinatario" class="etiqueta-formulario">Para:</label>
+                        <input type="email" class="entrada-formulario" id="redactar-destinatario" required>
+                    </div>
+                    <div class="grupo-formulario">
+                        <label for="redactar-asunto" class="etiqueta-formulario">Asunto:</label>
+                        <input type="text" class="entrada-formulario" id="redactar-asunto" required>
+                    </div>
+                    <div class="grupo-formulario">
+                        <label for="redactar-contenido" class="etiqueta-formulario">Contenido:</label>
+                        <textarea class="entrada-formulario area-texto" id="redactar-contenido" required></textarea>
+                    </div>
+                    <div class="botones-accion">
+                        <button type="button" class="boton boton-inactivo" id="btn-cancelar-redactar">Cancelar</button>
+                        <button type="button" id="btn-guardar" class="boton" style="background-color: #ffc107;">Guardar Borrador</button>
+                        <button type="button" id="btn-enviar" class="boton boton-accion">Enviar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="usuario.js"></script>
+</body>
+</html>
